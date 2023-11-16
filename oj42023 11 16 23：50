@@ -1,0 +1,73 @@
+#include<stdio.h>
+#pragma warning(disable:4996)
+int main()
+{
+	int n, m;
+	long long int i,j;
+	long long int quesun[100], mubiao[100];
+	long long int hang[150] = { 0 };//定义一行有多少个元素//
+	int sum = 0, k = 0, l = 0;//sum代表一行内缺损点个数//k代表第k个缺损点//l代表第l个目标点//
+	long long int print;//负责打印的点
+	long long int weizhi;//负责记录父节点位置的变量//
+	int p,q;//这两个变量用于dowhile循环内的双循环//
+	long long int zhan[150],t=1;//t用于存储栈的角标//
+	scanf("%d %d", &n, &m);//读入n，m
+	for (i = 0; i < n; i++)
+		scanf("%lld", &quesun[i]);//读入缺损点
+	for (j = 0; j < m; j++)
+		scanf("%lld", &mubiao[j]);//读入目标点
+	i = 1; j = 1;//i代表数////j代表当前行数
+	hang[0] = 1;
+	if (mubiao[0] == 1)
+	{
+		printf("1 \n");
+		l += 1;
+	}//判断1//
+	do {
+		i += 1;//直接从第二行开始//
+		//判断是否该换行//
+		hang[j] += 1;//个数//
+		if (i == quesun[k])//如果它是缺损点//
+		{
+			k += 1;
+			sum += 1;//这一行的第sum个缺损点//
+		}
+		//******************//
+		if (i == mubiao[l])
+		{
+			if (j >= 2)
+			{
+				t = 1;//重置栈的角标//
+				print = i;//用于打印，防止改变i的值//
+				weizhi = hang[j];//目前位置//
+				zhan[0] = i;//栈的第0个数为现在的数//
+				print -= hang[j];
+				for (p = j - 1; p >= 0; p--)
+				{
+					print -= hang[p];
+					weizhi = (weizhi + 1) / 2;
+					zhan[t] = (print+weizhi);
+					t += 1;
+				}
+				printf("1 ");
+				for (t = j - 1; t >= 0; t--)
+					printf("%lld ", zhan[t]);
+				printf("\n");
+			}//实现了不带缺损点的输出//
+			else
+			{
+				if (i == 2)
+					printf("1 2 \n");
+				else if (i == 3)
+					printf("1 3 \n");
+			}//判断2，3
+			l += 1;
+		}
+		if (hang[j] == 2 * (hang[j - 1] - sum))
+		{
+			j += 1;
+			sum = 0;//新一行的缺损点数目//
+		}
+	} while (i!=(mubiao[m-1]+1));//没有找到最后一个目标点之前一直加
+	return 0;
+}
