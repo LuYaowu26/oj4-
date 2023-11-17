@@ -3,71 +3,76 @@
 int main()
 {
 	int n, m;
-	long long int i,j;
-	long long int quesun[100], mubiao[100];
-	long long int hang[150] = { 0 };//定义一行有多少个元素//
-	int sum = 0, k = 0, l = 0;//sum代表一行内缺损点个数//k代表第k个缺损点//l代表第l个目标点//
-	long long int print;//负责打印的点
-	long long int weizhi;//负责记录父节点位置的变量//
-	int p,q;//这两个变量用于dowhile循环内的双循环//
-	long long int zhan[150],t=1;//t用于存储栈的角标//
-	scanf("%d %d", &n, &m);//读入n，m
+	long long int quesun[101], mubiao[101];
+	int i, j = 0, qs = 0;//记录缺损点
+	int k = 0, mb = 0;//记录目标点
+	long long int hang[150];
+	long long int end[150], begin[150];
+	int sumqs[150] = { 0 }, summb[150] = { 0 };//一行有多少个缺损点,目标点//
+	long long int t = 0, s = 0, u = 0,wzshu=0,wzshu1=0;//用于循环输出//
+	long long int qsweizhi[101],mbweizhi[101];//记录缺损点的位置和目标点位置//
+	long long int weizhi;
+	long long int zhan[150];//构建一个栈用于输出//
+	long long int qsshu[150][100] = { 0 };
+	scanf("%d%d", &n, &m);
 	for (i = 0; i < n; i++)
-		scanf("%lld", &quesun[i]);//读入缺损点
-	for (j = 0; j < m; j++)
-		scanf("%lld", &mubiao[j]);//读入目标点
-	i = 1; j = 1;//i代表数////j代表当前行数
-	hang[0] = 1;
-	if (mubiao[0] == 1)
+		scanf("%lld", &quesun[i]);
+	for (i = 0; i < m; i++)
+		scanf("%lld", &mubiao[i]);
+	begin[0] = 1; end[0] = 1; hang[0] = 1;
+	for (i = 1; i < 133; i++)//构造一个最大133行的树//
 	{
-		printf("1 \n");
-		l += 1;
-	}//判断1//
-	do {
-		i += 1;//直接从第二行开始//
-		//判断是否该换行//
-		hang[j] += 1;//个数//
-		if (i == quesun[k])//如果它是缺损点//
+		begin[i] = end[i - 1] + 1;//起始数//
+		hang[i] = (hang[i - 1] - sumqs[i - 1]) * 2;//行总元素数//
+		end[i] = begin[i] + hang[i] - 1;//末位数//
+		for (j = qs; j < n; j++)
 		{
-			k += 1;
-			sum += 1;//这一行的第sum个缺损点//
-		}
-		//******************//
-		if (i == mubiao[l])
-		{
-			if (j >= 2)
+			if (quesun[j] <= end[i] && quesun[j] >= begin[i])
 			{
-				t = 1;//重置栈的角标//
-				print = i;//用于打印，防止改变i的值//
-				weizhi = hang[j];//目前位置//
-				zhan[0] = i;//栈的第0个数为现在的数//
-				print -= hang[j];
-				for (p = j - 1; p >= 0; p--)
+				sumqs[i] += 1;				
+				qsshu[i][sumqs[i]] = quesun[j];//记录第i行第qs个缺损点//	
+				qsweizhi[qs] = quesun[j] - begin[i];//记录第x个缺损点在当行的位置
+				qs += 1;//记录找到了第几个缺损点//			
+			}
+			else
+				break;
+		}//找缺损点的函数//
+		for (k = mb; k < m; k++)
+		{
+			if (mubiao[k] <= end[i] && mubiao[k] >= begin[i])
+			{
+				summb[i] += 1;
+				mb += 1;
+				mbweizhi[k] = mubiao[k] - begin[i];//记录目标点的位置//
+				weizhi = mbweizhi[k];
+				for (t = i; t >= 0; t++)
 				{
-					print -= hang[p];
-					weizhi = (weizhi + 1) / 2;
-					zhan[t] = (print+weizhi);
-					t += 1;
+					zhan[t] = begin[t]+weizhi;
+					weizhi = weizhi / 2 + 1;
+					//以下去找第weizhi个不是缺损点的数//
+					u = 0; wzshu = 0; wzshu1 = 0;
+					for (s = begin[t]; s < end[t]; s++)
+					{
+						if (wzshu == weizhi)
+						{
+							zhan[t] = begin[t]+wzshu1;
+						}
+						if (s != qsshu[t][u])
+							wzshu += 1;
+						else
+						{
+							u += 1;
+						}
+						wzshu1 += 1;
+					}
 				}
-				printf("1 ");
-				for (t = j - 1; t >= 0; t--)
+				for (t = 0; t <= i; t++)
 					printf("%lld ", zhan[t]);
 				printf("\n");
-			}//实现了不带缺损点的输出//
+			}
 			else
-			{
-				if (i == 2)
-					printf("1 2 \n");
-				else if (i == 3)
-					printf("1 3 \n");
-			}//判断2，3
-			l += 1;
-		}
-		if (hang[j] == 2 * (hang[j - 1] - sum))
-		{
-			j += 1;
-			sum = 0;//新一行的缺损点数目//
-		}
-	} while (i!=(mubiao[m-1]+1));//没有找到最后一个目标点之前一直加
+				break;
+		}//找目标点并输出的函数//
+	}
 	return 0;
 }
